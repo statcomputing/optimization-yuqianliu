@@ -24,18 +24,23 @@ mytab3 <- nls(N ~ K*N0/(N0+(K-N0)*exp(-r*tt)),
 #range: K from 800 to 1300, r from 0.07 to 0.15
 K_plot <- seq(800, 1300, length.out = 100)
 r_plot <- seq(0.07, 0.15, length.out = 100)
+residual <- rep(0, length(N))
 error <- matrix(data = NA, nrow = length(K_plot), ncol = length(r_plot))
 residual_error <- function(K, r){
-  for (variable in vector) {
-    
+  for (i in 1:length(N)) {
+    residual[i] <- (N[i] - (K*N0)/(N0+(K-N0)*exp(-r*tt[i])))^2
   }
+  sum(residual)
 }
 for (i in 1:100) {
   for (j in 1:100) {
     error[j,i] <- residual_error(K_plot[j],r_plot[i])
   }
 }
-                                 
 
+contour(K_plot,r_plot,error)                               
+filled.contour(K_plot,r_plot,error,color.palette = terrain.colors,
+               xlab="K", ylab="r",
+               main="Residual Squared Error")  
 
 ## Probelm 3.c

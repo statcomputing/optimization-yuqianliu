@@ -13,6 +13,7 @@ require(knitr)
 knitr::opts_chunk$set(echo = TRUE)
 source("mainQ1_Yuqian_try2.R")
 source("mainQ2_Yuqian.R")
+source("mainQ3_Yuqian.R")
 ## specify global chunk options
 knitr::opts_chunk$set(fig.width = 5, fig.height = 4, dpi = 300,
                       out.width = "90%", fig.align = "center")
@@ -78,29 +79,86 @@ b) The observed sample is
 x1 <- c(1.77, -0.23, 2.76, 3.80, 3.47, 56.75, -1.34, 4.24, -2.44,
        3.29, 3.71, -2.40, 4.53, -0.07, -1.05, -13.87, -2.53, -1.75)
 ```
-The log-likelihood function is shown in Figure \@ref(fig:Q1b).
+The log-likelihood function is shown in following figure.
 
-(ref:Q1b) Log-likelihood of Cauchy.
-
-```{r Q1b, echo = TRUE, fig.cap = "(ref:Q1b)", fig.width = 8}
-plot(Theta_value, LogLik_plot,xlab = "theta",ylab = "log-likelihood",)
+```{r Q1b, echo = TRUE, fig.width = 8}
+plot(Theta_value, LogLik_plot,xlab = "theta",ylab = "log-likelihood",
+     main = "Log-likelihood of Cauchy.")
 ```
 Then, Newton-Raphson method with 
 ```{r, eval = FALSE}
 StartPoints <- c(-11, -1, 0, 1.5, 4, 4.7, 7, 8, 38)
 ```
-and sample mean as start points have been applied.
+and sample mean as start points have been applied. 
 The results are shown in follow.
 
+```{r mytab1.b} 
+knitr::kable(mytab1.b, caption = 'Newton-Raphson Method Results', booktabs = TRUE)
+```
+
 c) The fixed-point iterations using $G(x)=\alpha l'(\theta)+\theta$
-with scaling choices of $\alpha \in \{1, 0.64, 0.25\}$ have also been
-applied.
-The results are shown as follow.
+with scaling choices of $\alpha \in \{1, 0.64, 0.25\}$ is applied
+as follow,
+```{r, eval = FALSE}
+# l'(\theta)
+logLik_1st <- function(theta, x = x1){
+  n <- length(x)
+  term <- 0
+  for(i in 1:n){
+    term <- term + (theta-x1[i])/(1+(theta-x[i])^2)
+  }
+  -2*term
+}
+# G = alpha*l'(\theta)+theta
+G <- function(theta, alpha, x = x1){
+  alpha*logLik_1st(theta, x = x1) + theta
+}
+
+myIterator <- function(theta_init, f, eps = 1e-06, itmax = 10000, verbose = FALSE, 
+                       ...) {
+  theta_old <- theta_init
+  itel <- 1
+  repeat {
+    # theta_t+1 = G
+    theta_new <- f(theta_old, ...)
+    if (verbose) 
+      cat("Iteration: ", formatC(itel, width = 3, format = "d"), "theta_old: ", 
+          formatC(theta_old, digits = 8, width = 12, format = "f"), "theta_new: ", 
+          formatC(theta_new, digits = 8, width = 12, format = "f"), "\n")
+    if ((abs(theta_old - theta_new) < eps) || (itel == itmax)) {
+      return(c(theta_new, itel))
+    }
+    theta_old <- theta_new
+    itel <- itel + 1
+  }
+}
+```
+
+The results are shown as follow,.1, .2 and .3 represents results with 3 different 
+$\alpha$ values. 
+```{r, eval = FALSE } 
+alphas <- c(1, 0.64, 0.25)
+```
+```{r mytab1.c, echo = FALSE } 
+knitr::kable(mytab1.c, caption = 'Fixed Point Method Results', booktabs = TRUE)
+```
 
 d) The fisher scoring refined by Newton method has been conducted.
 The results are shown as follow.
+```{r mytab1.d, echo = FALSE} 
+knitr::kable(mytab1.d, caption = 'Fisher Scoring Method Results', booktabs = TRUE)
+```
 
-e) Compare the results from these different methods.
+```{r mytab1.d_newton} 
+knitr::kable(mytab1.d.withNewton, caption = 'Refined with Newton', booktabs = TRUE)
+```
+e) Compare the results from these different methods, we could see
+Newton-Raphson method takes general less iterations compared with other methods.
+For fixed point method, the choice of $\alpha$ is crucial. We see it may not converge to
+the optimal when $\alpha = 1$. However, if we choose a good $\alpha$, the performance are
+good.
+Fisher Scoring has stable perfomance but with time consuming. Then refined by Newton method,
+it get results very fast.
 
 ## Problem 2
 **Answer:** 
@@ -122,12 +180,11 @@ The observed sample is
 x2 <- c(3.91, 4.85, 2.28, 4.06, 3.70, 4.04, 5.46, 3.53, 2.28, 1.96,
        2.53, 3.88, 2.22, 3.47, 4.82, 2.46, 2.99, 2.54, 0.52)
 ```
-The log-likelihood function is shown in Figure \@ref(fig:Q2a).
+The log-likelihood function is shown in Figure.
 
-(ref:Q2a) Log-likelihood Function.
-
-```{r Q2a, echo = FALSE, fig.cap = "(ref:Q2a)", fig.width = 8}
-plot(Theta_value2, LogLik_plot2,xlab = "theta",ylab = "log-likelihood")
+```{r Q2a, echo = FALSE, fig.width = 8}
+plot(Theta_value2, LogLik_plot2,xlab = "theta",ylab = "log-likelihood",
+     main = "Log-likelihood Function.")
 ```
 
 b) Method of moments
@@ -145,14 +202,24 @@ ${\hat \theta _{moment}} = \arcsin (\bar x - \pi )$
 \end{align}
 
 c) With $\theta_0 = \hat \theta _{moment}$, using the Newton-Raphson method the MLE is
+```{r results_c, echo = FALSE} 
+# knitr::kable(results_c, caption = 'Newton-Raphson method Results', booktabs = TRUE)
+cat("Iteration: ", formatC(results_c$iterations, width = 3, format = "d"), ",theta: ", 
+    formatC(results_c$par, digits = 8, width = 12, format = "f"), ",objective: ", 
+    formatC(results_c$objective, digits = 8, width = 12, format = "f"), "\n")
+```
 
 d) With $\theta_0 = -2.7$ and $\theta_0 = 2.7$, the results are
+```{r results_d, echo = FALSE} 
+knitr::kable(results_d, caption = 'With different start points', booktabs = TRUE)
+```
 
 e) Repeat the above using 200 equally spaced starting values between $-\pi$ and $\pi$.
-The results are 
-Partition
-the values into sets of attraction, That is, divide the set of starting values into separate
-groups, with each group corresponding to a separate unique outcome of the optimization
+The results are too large to present here. It is seperated by sets of attraction.
+```{r}
+StartPoints3 <- seq(-pi,pi,length.out = 200)
+results_e <- sapply(StartPoints3, function(x0) nlminb(x0,ObjectFun2))
+```
 
 ## Problem 3
 **Answer:** 
@@ -162,6 +229,62 @@ The model for population growth is given by $\frac{{dN}}{{dt}} = rN(1 - \frac{N}
 The solution of this is 
 ${N_t} = f(t){\rm{ }} = \frac{{K{N_0}}}{{{N_0} + (K - {N_0}){\rm{ }}exp( - rt)}}$
 
-a)
-b)
-c)
+a) By using nls() in R, the results are K = 1049.4074581, r = 0.1182683 at optimal.
+
+
+Code chunk:
+```{r, eval = FALSE}
+beetles <- data.frame(
+  days = c(0, 8, 28, 41, 63, 69, 97, 117, 135, 154),
+  beetles = c(2, 47, 192, 256, 768, 896, 1120, 896, 1184, 1024))
+tt <-  c(8, 28, 41, 63, 69, 97, 117, 135, 154)
+N <- c(47, 192, 256, 768, 896, 1120, 896, 1184, 1024)
+N0 <- 2
+
+## lodaing package
+library(ggplot2)
+
+## Problem 3.a Gauss-Newton approach
+#nls from R
+mytab3 <- nls(N ~ K*N0/(N0+(K-N0)*exp(-r*tt)),
+              start = list(K = 2000, r = 0.1), trace = TRUE)
+```
+
+b) The contour plots of the sum of squared errors are shown as follow,
+```{r Q3b1, echo = FALSE, fig.width = 8}
+contour(K_plot,r_plot,error,xlab = "K",ylab = "r",
+     main = "Residual Squared Error")
+```
+```{r Q3b2, echo = FALSE, fig.width = 8}
+filled.contour(K_plot,r_plot,error,color.palette = terrain.colors,
+               xlab="K", ylab="r",
+               main="Residual Squared Error")  
+```
+
+Code chunk:
+```{r, eval = FALSE}
+## Problem 3.b Countour residual error
+#opti: K = 1049.4074581 r = 0.1182683
+#range: K from 800 to 1300, r from 0.07 to 0.15
+K_plot <- seq(800, 1300, length.out = 100)
+r_plot <- seq(0.07, 0.15, length.out = 100)
+residual <- rep(0, length(N))
+error <- matrix(data = NA, nrow = length(K_plot), ncol = length(r_plot))
+residual_error <- function(K, r){
+  for (i in 1:length(N)) {
+    residual[i] <- (N[i] - (K*N0)/(N0+(K-N0)*exp(-r*tt[i])))^2
+  }
+  sum(residual)
+}
+for (i in 1:100) {
+  for (j in 1:100) {
+    error[j,i] <- residual_error(K_plot[j],r_plot[i])
+  }
+}
+
+contour(K_plot,r_plot,error, xlab="K", ylab="r",
+               main="Residual Squared Error")                               
+filled.contour(K_plot,r_plot,error,color.palette = terrain.colors,
+               xlab="K", ylab="r",
+               main="Residual Squared Error")  
+```
