@@ -1,14 +1,21 @@
 ---
 title: "Homework2"
 author: "Yuqian Liu"
-date: "February 6, 2018"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+documentclass: article
+papersize: letter
+fontsize: 11pt
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
+require(knitr)
 knitr::opts_chunk$set(echo = TRUE)
 source("mainQ1_Yuqian_try2.R")
 source("mainQ2_Yuqian.R")
+## specify global chunk options
+knitr::opts_chunk$set(fig.width = 5, fig.height = 4, dpi = 300,
+                      out.width = "90%", fig.align = "center")
 ```
 
 
@@ -76,9 +83,24 @@ The log-likelihood function is shown in Figure \@ref(fig:Q1b).
 (ref:Q1b) Log-likelihood of Cauchy.
 
 ```{r Q1b, echo = TRUE, fig.cap = "(ref:Q1b)", fig.width = 8}
-plot(Theta_value, LogLik_plot,xlab = "theta",ylab = "log-likelihood")
+plot(Theta_value, LogLik_plot,xlab = "theta",ylab = "log-likelihood",)
 ```
+Then, Newton-Raphson method with 
+```{r, eval = FALSE}
+StartPoints <- c(-11, -1, 0, 1.5, 4, 4.7, 7, 8, 38)
+```
+and sample mean as start points have been applied.
+The results are shown in follow.
 
+c) The fixed-point iterations using $G(x)=\alpha l'(\theta)+\theta$
+with scaling choices of $\alpha \in \{1, 0.64, 0.25\}$ have also been
+applied.
+The results are shown as follow.
+
+d) The fisher scoring refined by Newton method has been conducted.
+The results are shown as follow.
+
+e) Compare the results from these different methods.
 
 ## Problem 2
 **Answer:** 
@@ -140,4 +162,6 @@ The model for population growth is given by $\frac{{dN}}{{dt}} = rN(1 - \frac{N}
 The solution of this is 
 ${N_t} = f(t){\rm{ }} = \frac{{K{N_0}}}{{{N_0} + (K - {N_0}){\rm{ }}exp( - rt)}}$
 
-
+a)
+b)
+c)

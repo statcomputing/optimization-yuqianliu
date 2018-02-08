@@ -5,8 +5,7 @@ StartPoints <- c(-11, -1, 0, 1.5, 4, 4.7, 7, 8, 38)
 ## lodaing package
 library(ggplot2)
 
-## first trial
-# Problem 1.b 
+## Problem 1.b 
 # loglikelihood
 Theta_value <- seq(-5, 5, by=0.05)
 
@@ -42,7 +41,20 @@ mytab <- sapply(c(StartPoints, mean(x1)), function(x0) nlminb(x0,ObjectFun))
 dimnames(mytab) <- list(c("theta","objective","convergence","iterations",
                           "evaluations","mesage"),c(StartPoints, mean(x1)))
 
-# Problem 1.c fixed point iterations
+## Problem 1.c fixed point iterations
+#l'(\theta)
+logLik_1st <- function(theta){
+  x1 <- c(1.77, -0.23, 2.76, 3.80, 3.47, 56.75, -1.34, 4.24, -2.44,
+          3.29, 3.71, -2.40, 4.53, -0.07, -1.05, -13.87, -2.53, -1.75)
+  n <- length(x1)
+  for(i in 1:n){
+    term <- term + (theta-x1[i])/(1+(theta-x1[i])^2)
+  }
+  -2*term
+}
+G <- function(theta,alpha){
+  alpha*logLik_1st(theta) + theta
+}
 myIterator <- function(xinit, f, eps = 1e-06, itmax = 100, verbose = FALSE, 
                        ...) {
   xold <- xinit
