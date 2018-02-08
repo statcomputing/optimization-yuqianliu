@@ -1,6 +1,4 @@
 # optimization-yuqianliu
-optimization-yuqianliu created by GitHub Classroom
-
 Hi Grader,
 
 I did some changes of my homework. However, when I tried to 
